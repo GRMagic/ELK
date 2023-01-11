@@ -1,0 +1,94 @@
+version: "3.9"
+services:
+
+  rabbitmq:
+    hostname: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672" # management
+      - "5672:5672"
+    volumes:
+    - rabbitmq_data:/var/lib/rabbitmq/mnesia
+    - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+    - ./rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro
+    - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    healthcheck:
+      test: rabbitmq-diagnostics listeners
+      interval: 15s
+      timeout: 10s
+      retries: 6
+    networks:
+      - log
+
+  elasticsearch:
+    hostname: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.3
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+      - network.host=0.0.0.0
+      - xpack.security.enabled=false
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -I -s -L http://localhost:9200 || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      - log
+
+  logstash:
+    hostname: logstash
+    image: docker.elastic.co/logstash/logstash:8.5.3
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - log
+
+  kibana:
+    hostname: kibana
+    image: docker.elastic.co/kibana/kibana:8.5.3
+    environment:
+      SERVER_NAME: kibana
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - log
+
+  application:
+     hostname: application
+     image: application_serilog
+     build:
+      context: ./application
+     ports:
+      - "18080:80"
+     depends_on:
+      rabbitmq:
+        condition: service_healthy
+     networks:
+      - log
+
+
+volumes:
+  rabbitmq_data:
+  elasticsearch_data:
+
+networks:
+  log:
+    driver: bridge

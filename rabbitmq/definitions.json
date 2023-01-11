@@ -1,0 +1,103 @@
+{
+    "rabbit_version":"3.11.5",
+    "rabbitmq_version":"3.11.5",
+    "product_name":"RabbitMQ",
+    "product_version":"3.11.5",
+    "users":[
+      {
+        "name":"logstash",
+        "password_hash":"WsyX/l4lez/nu9zKrCyOBEKyi+9agsZg1H33A6jf+RxV7FIY",
+        "hashing_algorithm":"rabbit_password_hashing_sha256",
+        "tags":[
+          
+        ],
+        "limits":{
+          
+        }
+      },
+	  {
+        "name":"myApplication",
+        "password_hash":"/dKmIHG4GzvXyzQsLZtvfppgJu+6t1cxVHy8D75xCa7RsxoR",
+        "hashing_algorithm":"rabbit_password_hashing_sha256",
+        "tags":[
+          
+        ],
+        "limits":{
+          
+        }
+      },
+      {
+        "name":"guest",
+        "password_hash":"x6V7vtfPTIHmwbduWXRvuvrF19Gjr6S3vpH0YPAoLZ965t02",
+        "hashing_algorithm":"rabbit_password_hashing_sha256",
+        "tags":[
+          "administrator"
+        ],
+        "limits":{
+          
+        }
+      }
+    ],
+    "vhosts":[
+      {
+        "name":"Log"
+      },
+      {
+        "name":"/"
+      }
+    ],
+    "permissions":[
+      {
+        "user":"guest",
+        "vhost":"Log",
+        "configure":".*",
+        "write":".*",
+        "read":".*"
+      },
+      {
+        "user":"guest",
+        "vhost":"/",
+        "configure":".*",
+        "write":".*",
+        "read":".*"
+      },
+      {
+        "user":"logstash",
+        "vhost":"Log",
+        "configure":".*",
+        "write":".*",
+        "read":".*"
+      },
+	  {
+        "user":"myApplication",
+        "vhost":"Log",
+        "configure":".*",
+        "write":".*",
+        "read":".*"
+      }
+    ],
+    "topic_permissions":[
+      
+    ],
+    "parameters":[
+      
+    ],
+    "global_parameters":[
+      {
+        "name":"internal_cluster_id",
+        "value":"rabbitmq-cluster-id-DHpNE3bUxoGA2q3KwWueEg"
+      }
+    ],
+    "policies":[
+      
+    ],
+    "queues":[
+      
+    ],
+    "exchanges":[
+      
+    ],
+    "bindings":[
+      
+    ]
+  }
